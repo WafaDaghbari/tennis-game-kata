@@ -6,8 +6,8 @@ public final class TennisGame {
 
     private final ScorePrinter scorePrinter;
 
-    private int scoreA;
-    private int scoreB;
+    private int pointsA;
+    private int pointsB;
     private boolean gameWon;
 
     public TennisGame(final ScorePrinter scorePrinter) {
@@ -22,56 +22,72 @@ public final class TennisGame {
             }
 
             switch (ball) {
-                case 'A' -> handleBallWonByA();
-                case 'B' -> handleBallWonByB();
+                case 'A' -> pointsA++;
+                case 'B' -> pointsB++;
                 default -> throw new IllegalArgumentException("Invalid input: " + ball);
             }
+            printScoreOrWinner();
         }
     }
 
-    private void handleBallWonByA() {
-        if (scoreA == 40 && scoreB < 40) {
-            scorePrinter.print("Player A wins the game");
+    private void printScoreOrWinner() {
+        if (hasWinner()) {
+            scorePrinter.print(winnerMessage());
             gameWon = true;
             return;
         }
 
-        scoreA = nextScore(scoreA);
-        printCurrentScore();
-    }
-
-    private void handleBallWonByB() {
-        if (scoreB == 40 && scoreA < 40) {
-            scorePrinter.print("Player B wins the game");
-            gameWon = true;
-            return;
-        }
-
-        scoreB = nextScore(scoreB);
-        printCurrentScore();
-    }
-
-    private void printCurrentScore() {
-        scorePrinter.print(formatScore());
-    }
-
-    private String formatScore() {
         if (isDeuce()) {
-            return "Deuce";
+            scorePrinter.print("Deuce");
+            return;
         }
-        return "Player A : " + scoreA + " / Player B : " + scoreB;
+
+        if (isAdvantageA()) {
+            scorePrinter.print("Advantage Player A");
+            return;
+        }
+
+        if (isAdvantageB()) {
+            scorePrinter.print("Advantage Player B");
+            return;
+        }
+
+        scorePrinter.print(formatStandardScore());
+    }
+
+    private boolean hasWinner() {
+        return (pointsA >= 4 || pointsB >= 4) && Math.abs(pointsA - pointsB) >= 2;
+    }
+
+    private String winnerMessage() {
+        return pointsA > pointsB
+                ? "Player A wins the game"
+                : "Player B wins the game";
     }
 
     private boolean isDeuce() {
-        return scoreA == 40 && scoreB == 40;
+        return pointsA >= 3 && pointsB >= 3 && pointsA == pointsB;
     }
 
-    private int nextScore(final int currentScore) {
-        return switch (currentScore) {
-            case 0 -> 15;
-            case 15 -> 30;
-            case 30 -> 40;
-            default -> currentScore;
+    private boolean isAdvantageA() {
+        return pointsA >= 3 && pointsB >= 3 && pointsA == pointsB + 1;
+    }
+
+    private boolean isAdvantageB() {
+        return pointsA >= 3 && pointsB >= 3 && pointsB == pointsA + 1;
+    }
+
+    private String formatStandardScore() {
+        return "Player A : " + toTennisScore(pointsA)
+                + " / Player B : " + toTennisScore(pointsB);
+    }
+
+    private int toTennisScore(final int points) {
+        return switch (points) {
+            case 0 -> 0;
+            case 1 -> 15;
+            case 2 -> 30;
+            default -> 40;
         };
     }
 }
