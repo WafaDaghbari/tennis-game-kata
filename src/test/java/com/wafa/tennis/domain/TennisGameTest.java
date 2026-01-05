@@ -54,4 +54,47 @@ class TennisGameTest {
         then(printer.outputs())
                 .doesNotContain("Deuce");
     }
+
+    @Test
+    void should_display_advantage_for_player_who_wins_ball_after_deuce() {
+        // Given
+        var printer = new FakeScorePrinter();
+        var tennisGame = new TennisGame(printer);
+
+        // When
+        tennisGame.play("ABABABA");
+
+        // Then
+        then(printer.outputs())
+                .last()
+                .isEqualTo("Advantage Player A");
+    }
+
+    @Test
+    void should_return_to_deuce_when_opponent_wins_ball_after_advantage() {
+        // Given
+        var printer = new FakeScorePrinter();
+        var tennisGame = new TennisGame(printer);
+
+        // When
+        tennisGame.play("ABABABAB");
+
+        // Then
+        then(printer.outputs()).last()
+                .isEqualTo("Deuce");
+    }
+
+    @Test
+    void should_win_game_when_player_with_advantage_wins_ball() {
+        // Given
+        var printer = new FakeScorePrinter();
+        var tennisGame = new TennisGame(printer);
+
+        // When
+        tennisGame.play("ABABABAA");
+
+        // Then
+        then(printer.outputs()).last()
+                .isEqualTo("Player A wins the game");
+    }
 }
