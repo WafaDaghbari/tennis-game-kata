@@ -30,32 +30,40 @@ public final class TennisGame {
     }
 
     private void handleBallWonByA() {
-        if (scoreA == 40) {
+        if (scoreA == 40 && scoreB < 40) {
             scorePrinter.print("Player A wins the game");
             gameWon = true;
             return;
         }
+
         scoreA = nextScore(scoreA);
         printCurrentScore();
     }
 
     private void handleBallWonByB() {
-        if (scoreB == 40) {
+        if (scoreB == 40 && scoreA < 40) {
             scorePrinter.print("Player B wins the game");
             gameWon = true;
             return;
         }
+
         scoreB = nextScore(scoreB);
         printCurrentScore();
     }
 
+    private void printCurrentScore() {
+        scorePrinter.print(formatScore());
+    }
 
     private String formatScore() {
+        if (isDeuce()) {
+            return "Deuce";
+        }
         return "Player A : " + scoreA + " / Player B : " + scoreB;
     }
 
-    private void printCurrentScore() {
-        scorePrinter.print(formatScore());
+    private boolean isDeuce() {
+        return scoreA == 40 && scoreB == 40;
     }
 
     private int nextScore(final int currentScore) {
